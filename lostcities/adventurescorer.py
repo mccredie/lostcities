@@ -1,5 +1,5 @@
 
-class Adventure:
+class AdventureScorer:
     def __init__(self):
         self._investments = 0
         self._score = -20
