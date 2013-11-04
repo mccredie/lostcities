@@ -6,7 +6,7 @@ from collections import defaultdict
 import lostcities
 
 def init_game():
-    game = lostcities.GameState()
+    game = lostcities.Game()
     thedeck = list(lostcities.deck_gen())
 
     random.shuffle(thedeck)

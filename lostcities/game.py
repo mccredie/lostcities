@@ -1,7 +1,7 @@
 
 from collections import defaultdict
 
-class GameState:
+class Game:
     def __init__(self):
         self.hands = ([], [])
         self.adventures = (defaultdict(list), defaultdict(list))

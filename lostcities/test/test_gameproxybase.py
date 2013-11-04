@@ -2,14 +2,14 @@
 import unittest
 
 from .. import gameproxybase
-from .. import gamestate
+from .. import game
 from .. import deck
 
 class GameProxyBaseTests(unittest.TestCase):
     class_under_test = gameproxybase.GameProxyBase
     def test_hand_attribute_returns_copy_of_players_hand(self):
         p1 = 1
-        g = gamestate.GameState()
+        g = game.Game()
         p1_hand = g.hands[p1][:] = [('r', 1), ('r', 2), ('w', 3), ('b', 4)]
 
         p = self.class_under_test(g, p1)
@@ -21,7 +21,7 @@ class GameProxyBaseTests(unittest.TestCase):
 
     def test_discards_attribute_returns_set_of_top_discards(self):
         p1 = 1
-        g = gamestate.GameState()
+        g = game.Game()
         g.discards['r'][:] = [('r', x) for x in [1,2,3,4]]
         g.discards['g'][:] = [('g', x) for x in [5,6,7,8]]
         g.discards['b'][:] = [('b', x) for x in [9,10,11,12]]
@@ -38,7 +38,7 @@ class GameProxyBaseTests(unittest.TestCase):
 
     def test_discards_attribute_returns_set_of_top_discards_sans_empty(self):
         p1 = 1
-        g = gamestate.GameState()
+        g = game.Game()
         g.discards['r'][:] = []
         g.discards['g'][:] = [('g', x) for x in [5, 6, 7, 8]]
         g.discards['b'][:] = [('b', x) for x in [9, 10, 11, 12]]
@@ -54,7 +54,7 @@ class GameProxyBaseTests(unittest.TestCase):
 
     def test_adventures_returns_dict_of_adventure_piles(self):
          p1 = 1
-         g = gamestate.GameState()
+         g = game.Game()
          p = self.class_under_test(g, p1)
 
          g.hands[p1][:] = [('r', 2), ('g', 3), ('b', 4)]
@@ -74,7 +74,7 @@ class GameProxyBaseTests(unittest.TestCase):
          p0 = 0
          p1 = 1
 
-         g = gamestate.GameState()
+         g = game.Game()
          p = self.class_under_test(g, p0)
 
          g.hands[p1][:] = [('r', 2), ('g', 3), ('b', 4)]
@@ -92,7 +92,7 @@ class GameProxyBaseTests(unittest.TestCase):
 
     def test_get_deck_remaining(self):
         p1 = 0
-        g = gamestate.GameState()
+        g = game.Game()
         g.deck = list(deck.deck_gen())
 
         p = self.class_under_test(g, p1)
