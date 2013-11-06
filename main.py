@@ -7,10 +7,8 @@ import lostcities
 
 def init_game():
     game = lostcities.Game()
-    thedeck = list(lostcities.deck_gen())
-
-    random.shuffle(thedeck)
-    game.deck = thedeck
+    game.deck[:] = lostcities.deck_gen()
+    random.shuffle(game.deck)
 
     # deal
     for _ in range(7):
@@ -18,6 +16,7 @@ def init_game():
             game.draw(p)
 
     return game
+
 
 class CardValueGetter:
     def __init__(self, ivalue=None):
@@ -52,7 +51,7 @@ class GameScorer:
     
     @staticmethod
     def from_gamestate(game):
-        return tuple(GameScorer.from_dict(game.adventures[p])
+        return tuple(GameScorer.from_dict(game.players[p].adventures)
                 for p in range(2))
 
         
@@ -391,39 +390,41 @@ def play_games(count, player=TrickyPlayer, *args, **kwargs):
 
 def main():
     game = init_game()
-    runner = lostcities.GameRunner(game, TrickyPlayer(),
-            TrickyPlayer())
+    runner = lostcities.GameRunner(game, TheOnePlayer(),
+            TheOnePlayer())
 
     while not runner.game_is_over:
         runner.update()
 
     print("p1") 
-    pprint.pprint(dict(game.adventures[0]))
-    print("total:", score(game.adventures[0]))
+    pprint.pprint(dict(game.players[0].adventures))
+    print("total:", score(game.players[0].adventures))
 
     print("p2") 
-    pprint.pprint(dict(game.adventures[1]))
-    print("total:", score(game.adventures[1]))
+    pprint.pprint(dict(game.players[1].adventures))
+    print("total:", score(game.players[1].adventures))
 
 
 if __name__ == "__main__":
-    from matplotlib.pyplot import hist
-    from numpy import mean, std
+    main()
 
-    risk = -4
-    cutoff = 8
-    print("risk:", risk)
-    print("cutoff:", cutoff)
-    
-    results = list(play_games(
-            1000, TheOnePlayer, -4, 4))
-            
-    avg = mean(results)
-    dev = std(results)
-    print("mean:", avg)
-    print("std dev:", dev)
-    print("ratio:", avg / dev)
-    hist(results)
+    #from matplotlib.pyplot import hist
+    #from numpy import mean, std
+
+    #risk = -4
+    #cutoff = 8
+    #print("risk:", risk)
+    #print("cutoff:", cutoff)
+    #
+    #results = list(play_games(
+    #        1000, TheOnePlayer, -4, 4))
+    #        
+    #avg = mean(results)
+    #dev = std(results)
+    #print("mean:", avg)
+    #print("std dev:", dev)
+    #print("ratio:", avg / dev)
+    #hist(results)
 
     
 

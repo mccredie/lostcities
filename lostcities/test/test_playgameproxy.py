@@ -33,6 +33,7 @@ class PlayGameProxyTests(test_gameproxybase.GameProxyBaseTests):
     def class_under_test(g, p): 
         return playgameproxy.PlayGameProxy(g, None, p)
 
+
     def test_play_calls_play_with_same_card_index0(self):
         p0 = 0
         g = StubGameState()

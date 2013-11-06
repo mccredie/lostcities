@@ -10,7 +10,7 @@ class GameProxyBaseTests(unittest.TestCase):
     def test_hand_attribute_returns_copy_of_players_hand(self):
         p1 = 1
         g = game.Game()
-        p1_hand = g.hands[p1][:] = [('r', 1), ('r', 2), ('w', 3), ('b', 4)]
+        p1_hand = g.players[p1].hand[:] = [('r', 1), ('r', 2), ('w', 3), ('b', 4)]
 
         p = self.class_under_test(g, p1)
         proxy_hand = p.hand
@@ -57,7 +57,7 @@ class GameProxyBaseTests(unittest.TestCase):
          g = game.Game()
          p = self.class_under_test(g, p1)
 
-         g.hands[p1][:] = [('r', 2), ('g', 3), ('b', 4)]
+         g.players[p1].hand[:] = [('r', 2), ('g', 3), ('b', 4)]
          g.play(p1, 0)
          g.play(p1, 0)
          g.play(p1, 0)
@@ -65,10 +65,11 @@ class GameProxyBaseTests(unittest.TestCase):
          expected = {'r': [('r', 2)], 'g': [('g', 3)],
                  'b': [('b', 4)], 'w':[], 'y': []}
 
+         gp = g.players[p1]
          self.assertEqual(expected, p.adventures)
-         self.assertIsNot(g.adventures[p1], p.adventures)
+         self.assertIsNot(gp.adventures, p.adventures)
          for a in p.adventures:
-             self.assertIsNot(g.adventures[p1][a], p.adventures[a])
+             self.assertIsNot(gp.adventures[a], p.adventures[a])
 
     def test_other_adventures_returns_other_player_adventure_piles(self):
          p0 = 0
@@ -77,7 +78,7 @@ class GameProxyBaseTests(unittest.TestCase):
          g = game.Game()
          p = self.class_under_test(g, p0)
 
-         g.hands[p1][:] = [('r', 2), ('g', 3), ('b', 4)]
+         g.players[p1].hand[:] = [('r', 2), ('g', 3), ('b', 4)]
          g.play(p1, 0)
          g.play(p1, 0)
          g.play(p1, 0)
@@ -85,15 +86,16 @@ class GameProxyBaseTests(unittest.TestCase):
          expected = {'r': [('r', 2)], 'g': [('g', 3)], 
                  'b': [('b', 4)], 'w': [], 'y': []}
 
+         gp0 = g.players[p0]
          self.assertEqual(expected, p.other_adventures)
-         self.assertIsNot(g.adventures[p1], p.adventures)
-         for a in p.adventures:
-             self.assertIsNot(g.adventures[p1][a], p.adventures[a])
+         self.assertIsNot(gp0.adventures, p.other_adventures)
+         for a in p.other_adventures:
+             self.assertIsNot(gp0.adventures[a], p.other_adventures[a])
 
     def test_get_deck_remaining(self):
         p1 = 0
         g = game.Game()
-        g.deck = list(deck.deck_gen())
+        g.deck[:] = deck.deck_gen()
 
         p = self.class_under_test(g, p1)
 

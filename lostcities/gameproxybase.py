@@ -1,4 +1,6 @@
 
+import copy
+
 class GameProxyBase:
     def __init__(self, game, player):
         self._game = game
@@ -7,7 +9,7 @@ class GameProxyBase:
 
     @property
     def hand(self):
-        return self._game.hands[self._player][:]
+        return self._game.players[self._player].hand[:]
 
 
     @property
@@ -16,22 +18,15 @@ class GameProxyBase:
                 for v in self._game.discards.values()
                     if v)
 
-
-    def _copy_adventures(self, player):
-        adventures = {c:[] for c in 'rgbwy'}
-        for c, v in self._game.adventures[player].items():
-            adventures[c][:] = v
-        return adventures
-
-
     @property
     def adventures(self):
-        return self._copy_adventures(self._player)
+        return copy.deepcopy(self._game.players[self._player].adventures)
                 
 
     @property
     def other_adventures(self):
-        return self._copy_adventures(self._player + 1 % 2)
+        other_player = (self._player + 1) % 2
+        return copy.deepcopy(self._game.players[other_player].adventures)
 
 
     @property
