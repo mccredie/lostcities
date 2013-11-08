@@ -5,12 +5,15 @@ from .. import gameproxybase
 from .. import game
 from .. import deck
 
+
+
 class GameProxyBaseTests(unittest.TestCase):
     class_under_test = gameproxybase.GameProxyBase
     def test_hand_attribute_returns_copy_of_players_hand(self):
         p1 = 1
         g = game.Game()
-        p1_hand = g.players[p1].hand[:] = [('r', 1), ('r', 2), ('w', 3), ('b', 4)]
+        p1_hand = g.players[p1].hand[:] = [
+                ('r', 1), ('r', 2), ('w', 3), ('b', 4)]
 
         p = self.class_under_test(g, p1)
         proxy_hand = p.hand
@@ -71,6 +74,7 @@ class GameProxyBaseTests(unittest.TestCase):
          for a in p.adventures:
              self.assertIsNot(gp.adventures[a], p.adventures[a])
 
+
     def test_other_adventures_returns_other_player_adventure_piles(self):
          p0 = 0
          p1 = 1
@@ -91,6 +95,7 @@ class GameProxyBaseTests(unittest.TestCase):
          self.assertIsNot(gp0.adventures, p.other_adventures)
          for a in p.other_adventures:
              self.assertIsNot(gp0.adventures[a], p.other_adventures[a])
+
 
     def test_get_deck_remaining(self):
         p1 = 0

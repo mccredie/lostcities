@@ -8,10 +8,10 @@ class PlayGameProxy(gameproxybase.GameProxyBase):
         self._runner = runner
 
     def play(self, index):
-        self._game.play(self._player, index)
-        self._runner.finish()
+        card = self._game.play(self._player, index)
+        self._runner.finish_play(card)
 
     def discard(self, index):
-        self._game.discard(self._player, index)
-        self._runner.finish()
+        card = self._game.discard(self._player, index)
+        self._runner.finish_discard(card)
 

@@ -40,7 +40,9 @@ class Game:
 
     def draw_from(self, player, adventure):
         self._check_player_value(player)
-        self.players[player].hand.append(self.discards[adventure].pop())
+        the_card = self.discards[adventure].pop()
+        self.players[player].hand.append(the_card)
+        return the_card
         
 
     def _card_value(self, card):
@@ -63,9 +65,13 @@ class Game:
         del self.players[player].hand[cardindex]
         self.players[player].adventures[adventure].append(card)
 
+        return card
+
 
     def discard(self, player, cardindex):
         self._check_player_value(player)
         card = self.players[player].hand.pop(cardindex)
         self.discards[card[0]].append(card)
+
+        return card
 

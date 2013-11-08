@@ -32,6 +32,19 @@ class GameTests(unittest.TestCase):
         self.assertEqual(g.discards['r'], discards[:-1])
         self.assertEqual(g.players[p].hand, [discards[-1]])
 
+    def test_get_draw_from_returns_the_drawn_card(self):
+        p = 0
+        adventure = 'r'
+        g = game.Game()
+        top_card = ('r', 4)
+        discards = [('r', 1), ('r', 2), ('r', 3) , top_card] 
+        g.discards['r'][:] = discards[:]
+
+        self.assertEqual(top_card, g.draw_from(p, 'r'))
+
+        self.assertEqual(g.discards['r'], discards[:-1])
+        self.assertEqual(g.players[p].hand, [discards[-1]])
+
 
     def test_play_puts_card_in_adventure(self):
         p = 0
@@ -45,6 +58,16 @@ class GameTests(unittest.TestCase):
         self.assertEqual(hand[1:], g.players[p].hand)
     
 
+    def test_play_returns_played_card(self):
+        p = 0
+        g = game.Game()
+        the_card = ('r', 1)
+        hand = [the_card, ('g', 2), ('b', 3) , ('b', 4)] 
+        g.players[p].hand[:] = hand[:]
+
+        self.assertEqual(the_card, g.play(p, 0))
+
+
     def test_discard_puts_card_in_correct_pile(self):
         p = 0
         g = game.Game()
@@ -55,6 +78,16 @@ class GameTests(unittest.TestCase):
 
         self.assertEqual([('g', 2)], g.discards['g'])
         self.assertEqual([('r', 1), ('b', 3), ('b', 4)] , g.players[p].hand)
+
+
+    def test_discard_returns_discarded_card(self):
+        p = 0
+        g = game.Game()
+        the_card = ('g', 2)
+        hand = [('r', 1), the_card, ('b', 3) , ('b', 4)] 
+        g.players[p].hand[:] = hand[:]
+
+        self.assertEqual(the_card, g.discard(p, 1))
 
 
     def test_p2_draw_moves_top_card_from_deck_to_hand(self):

@@ -9,10 +9,10 @@ class DrawGameProxy(GameProxyBase):
 
     def draw(self):
         self._game.draw(self._player)
-        self._runner.finish()
+        self._runner.finish_draw()
 
 
     def draw_from(self, adventure):
-        self._game.draw_from(self._player, adventure)
-        self._runner.finish()
+        card = self._game.draw_from(self._player, adventure)
+        self._runner.finish_draw_from(card)
 

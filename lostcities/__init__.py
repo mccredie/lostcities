@@ -1,10 +1,10 @@
 
 from .game import Game
-from .gamerunner import GameRunner
+from .gamerunner import GameRunner, Player
 from .adventurescorer import AdventureScorer
 from .deck import deck_gen, SUITS, VALUES, INVESTMENT
 
 
-__all__ = ["Game", "GameRunner", 
+__all__ = ["Game", "GameRunner", "Player"
         "AdventureScorer", "deck_gen", 
         "SUITS", "VALUES", "INVESTMENT"]

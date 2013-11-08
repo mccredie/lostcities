@@ -76,7 +76,7 @@ class GameScorer:
         return set(self._adventures)
         
 
-class TheOnePlayer:
+class TheOnePlayer(lostcities.Player):
     def __init__(self, risk=-5, cutoff=6):
         self._get_card_value = CardValueGetter()
         self._to_discard = []
@@ -172,7 +172,7 @@ class TheOnePlayer:
 
 
         
-class GatedPlayer:
+class GatedPlayer(lostcities.Player):
     def __init__(self, max_suits=2, ivalue=-11):
         self._get_value = CardValueGetter(ivalue)
         self._to_discard = []
@@ -237,7 +237,7 @@ class GatedPlayer:
             game.draw()
 
 
-class RestrictedPlayer:
+class RestrictedPlayer(lostcities.Player):
     def __init__(self, colors=lostcities.SUITS, minvalue=2, ivalue=None):
         self._colors = colors
         self._minvalue = minvalue
@@ -291,7 +291,7 @@ def get_remainder(card):
     
     
 
-class TrickyPlayer:
+class TrickyPlayer(lostcities.Player):
     def __init__(self):
         self.colors_played = set()
         self._to_discard = []
@@ -341,7 +341,7 @@ class TrickyPlayer:
         game.draw()
 
 
-class DiscardPlayer:
+class DiscardPlayer(lostcities.Player):
     def play_card(self, game):
         game.discard(0)
 
@@ -350,7 +350,7 @@ class DiscardPlayer:
         game.draw()
 
 
-class StupidPlayer:
+class StupidPlayer(lostcities.Player):
     def play_card(self, game):
         for i, card in enumerate(game.hand):
             try:
@@ -375,6 +375,7 @@ def score(adventures):
             scorer.put(value)
         total += scorer.score()
     return total
+
 
 def play_games(count, player=TrickyPlayer, *args, **kwargs):
     for _ in range(count):
@@ -403,6 +404,7 @@ def main():
     print("p2") 
     pprint.pprint(dict(game.players[1].adventures))
     print("total:", score(game.players[1].adventures))
+
 
 
 if __name__ == "__main__":
