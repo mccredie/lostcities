@@ -1,9 +1,14 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
 
 import random
 import pprint
 from collections import defaultdict
 
 import lostcities
+
+
 
 def init_game():
     game = lostcities.Game()
@@ -73,10 +78,30 @@ class GameScorer:
         
     @property
     def active_suits(self):
-        return set(self._adventures)
+        return set(self._adventures)       
+
         
 
 class TheOnePlayer(lostcities.Player):
+    """ This player does the following:
+        - Only begins playing on a stack when it knows it can achieve a score
+          of 'risk'
+        - Stops starting new piles when it is within 'cutoff' cards from the
+          end of the deck.
+        - Draws from draw piles that contain cards for adventures that it is
+          involved in.
+        - Discards cards that it cannot play
+        - Discards lowest value card for inactive suits before active suits
+
+    Note that this is still a heuristic AI.  It does not take into account
+    what the other player is doing, or whether it may be benefiting the other
+    player. 
+
+    This is the first AI that I have implemented that is capable of fairly
+    consistently beating the DiscardPlayer.  Although it isn't immensely
+    complicated, it does illustrate how deceptively difficult this game is.
+    """
+
     def __init__(self, risk=-5, cutoff=6):
         self._get_card_value = CardValueGetter()
         self._to_discard = []
@@ -162,12 +187,12 @@ class TheOnePlayer(lostcities.Player):
             
     
     def draw(self, game):
-        # todo: make it smart
         suits = set(s for s, c in game.adventures.items() if c)
 
         for card in game.discards:
             if card[0] in suits and self._is_playable(card):
                 game.draw_from(card[0])
+                return
         game.draw()
 
 
@@ -275,6 +300,7 @@ class RestrictedPlayer(lostcities.Player):
     def draw(self, game):
         game.draw()
 
+
 def can_play_on(top, card):
     if top is None or top == lostcities.INVESTMENT:
         return True
@@ -284,6 +310,9 @@ def can_play_on(top, card):
 
 
 def get_remainder(card):
+    """ Returns the list of card values that could possibly be played on top of
+    the listed card.
+    """
     v = card[1]
     if v == lostcities.INVESTMENT:
         v = 11
@@ -408,25 +437,24 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    #main()
 
-    #from matplotlib.pyplot import hist
-    #from numpy import mean, std
-
-    #risk = -4
-    #cutoff = 8
-    #print("risk:", risk)
-    #print("cutoff:", cutoff)
-    #
-    #results = list(play_games(
-    #        1000, TheOnePlayer, -4, 4))
-    #        
-    #avg = mean(results)
-    #dev = std(results)
-    #print("mean:", avg)
-    #print("std dev:", dev)
-    #print("ratio:", avg / dev)
-    #hist(results)
+    from matplotlib.pyplot import hist
+    from numpy import mean, std
+    risk = -4
+    cutoff = 8
+    print("risk:", risk)
+    print("cutoff:", cutoff)
+    
+    results = list(play_games(
+            1000, TheOnePlayer, -4, 4))
+            
+    avg = mean(results)
+    dev = std(results)
+    print("mean:", avg)
+    print("std dev:", dev)
+    print("ratio:", avg / dev)
+    hist(results)
 
     
 

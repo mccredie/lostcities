@@ -5,12 +5,14 @@ from . import playgameproxy
 from . import drawgameproxy
 
 
+
 class Player(metaclass=abc.ABCMeta):
     """ This class represents the interface that must be implemented to
     interface with the game via a game runner. It could be implemented to
     interact with a user interface to get the game decisions from the player.
     It could also be implemented as an AI. 
     """
+
 
     @abc.abstractmethod
     def play_card(self, play_proxy):
@@ -56,24 +58,24 @@ class Player(metaclass=abc.ABCMeta):
 
 
 class _GameRunnerState:
-    def __init__(self, do, *args):
+    def __init__(self, do, get_args=tuple):
         self.next_state = self
         self.current_player = None
         self.other_player = None
         self._do = do
-        self._args = args
+        self._get_args = get_args
 
 
     def update(self):
-        self._do(*self._args)
+        self._do(*self._get_args())
 
 
 
-def _get_init_state(p1, p2, runner, game):
-    p1_play_proxy = playgameproxy.PlayGameProxy(game, runner, 0)
-    p1_draw_proxy = drawgameproxy.DrawGameProxy(game, runner, 0)
-    p2_play_proxy = playgameproxy.PlayGameProxy(game, runner, 1)
-    p2_draw_proxy = drawgameproxy.DrawGameProxy(game, runner, 1)
+def _get_init_state(p1, p2, observer, game):
+    p1_play_proxy = lambda: (playgameproxy.PlayGameProxy(game, 0, observer),)
+    p1_draw_proxy = lambda: (drawgameproxy.DrawGameProxy(game, 0, observer),)
+    p2_play_proxy = lambda: (playgameproxy.PlayGameProxy(game, 1, observer),)
+    p2_draw_proxy = lambda: (drawgameproxy.DrawGameProxy(game, 1, observer),)
 
     p1_play_card = _GameRunnerState(p1.play_card, p1_play_proxy)
     p1_play_card.current_player = p1
@@ -95,11 +97,12 @@ def _get_init_state(p1, p2, runner, game):
     p1_draw.next_state = p2_play_card
     p2_play_card.next_state = p2_draw
     p2_draw.next_state = p1_play_card
+
     return p1_play_card
 
 
 
-class GameRunner(object):
+class GameRunner(playgameproxy.PlayObserver, drawgameproxy.DrawObserver):
     def __init__(self, game, p1, p2):
         self._state = _get_init_state(p1, p2, self, game)
         self._game = game
@@ -111,6 +114,7 @@ class GameRunner(object):
         self.game_is_over = self._game.game_over
 
 
+    # PlayObserver
     def finish_play(self, card):
         self._state.other_player.they_played(card)
         self._state = self._state.next_state
@@ -121,6 +125,7 @@ class GameRunner(object):
         self._state = self._state.next_state
 
 
+    # DrawObserver
     def finish_draw(self):
         self._state.other_player.they_drew()
         self._state = self._state.next_state

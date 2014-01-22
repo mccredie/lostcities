@@ -3,6 +3,7 @@ import unittest
 
 from .. import drawgameproxy
 from .. import game
+from ..illeaglemoveerror import IlleagleMoveError
 from . import test_gameproxybase
 
 
@@ -37,13 +38,13 @@ class StubGameRunner:
 class DrawGameProxyTests(test_gameproxybase.GameProxyBaseTests):
     @staticmethod
     def class_under_test(g, p): 
-        return drawgameproxy.DrawGameProxy(g, None, p)
+        return drawgameproxy.DrawGameProxy(g, p, None)
 
     def test_draw_calls_draw_with_player(self):
         p1 = 1
         g = MockGame()
         r = StubGameRunner()
-        p = drawgameproxy.DrawGameProxy(g, r, p1)
+        p = drawgameproxy.DrawGameProxy(g, p1, r)
         p.draw()
 
         self.assertEqual(p1, g.draw_player)
@@ -54,7 +55,7 @@ class DrawGameProxyTests(test_gameproxybase.GameProxyBaseTests):
         adventure = 'r'
         g = MockGame()
         r = StubGameRunner()
-        p = drawgameproxy.DrawGameProxy(g, r, p1)
+        p = drawgameproxy.DrawGameProxy(g, p1, r)
 
         p.draw_from(adventure)
 
@@ -66,7 +67,7 @@ class DrawGameProxyTests(test_gameproxybase.GameProxyBaseTests):
         p1 = 1
         g = MockGame()
         r = StubGameRunner()
-        p = drawgameproxy.DrawGameProxy(g, r, p1)
+        p = drawgameproxy.DrawGameProxy(g, p1, r)
         p.draw()
 
         self.assertTrue(r.finish_draw_called)
@@ -79,9 +80,38 @@ class DrawGameProxyTests(test_gameproxybase.GameProxyBaseTests):
         g.discards[suit].append(card_to_draw)
 
         r = StubGameRunner()
-        p = drawgameproxy.DrawGameProxy(g, r, p1)
+        p = drawgameproxy.DrawGameProxy(g, p1, r)
 
         p.draw_from(suit)
 
         self.assertEqual(card_to_draw, r.finish_draw_from_card)
+
+    
+    def test_proxy_useless_after_draw_from(self):
+        p1 = 1
+        g = game.Game()
+        card_to_draw = suit, _ = 'r', 10
+        g.discards[suit].append(card_to_draw)
+
+        r = StubGameRunner()
+        p = drawgameproxy.DrawGameProxy(g, p1, r)
+
+        p.draw_from(suit)
+
+        self.assertRaises(IlleagleMoveError, p.draw)
+        
+
+    def test_proxy_useless_after_play(self):
+        p1 = 1
+        g = game.Game()
+        card_to_draw = suit, _ = 'r', 10
+        g.deck[:] = [('g', 5)]
+        g.discards[suit].append(card_to_draw)
+
+        r = StubGameRunner()
+        p = drawgameproxy.DrawGameProxy(g, p1, r)
+
+        p.draw()
+
+        self.assertRaises(IlleagleMoveError, p.draw_from, suit)
         

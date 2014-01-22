@@ -1,0 +1,12 @@
+
+
+1. Write docstrings.
+
+2. Make web app restful api
+
+3. Make interactive web application
+
+4. Think about exception safety a little more.  Basically if a player throws an
+   exception, the game is over.  Should it be?  What are the hosts
+   responsibilities? 
+

@@ -1,6 +1,7 @@
 
 import copy
 
+
 class GameProxyBase:
     def __init__(self, game, player):
         self._game = game
@@ -32,4 +33,5 @@ class GameProxyBase:
     @property
     def deck_remaining(self):
         return len(self._game.deck)
+
 

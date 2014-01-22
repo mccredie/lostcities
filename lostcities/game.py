@@ -27,7 +27,6 @@ class Game:
     def game_over(self):
         return not bool(self.deck)
 
-
     def _check_player_value(self, player):
         if not 0 <= player <= 1: 
             raise ValueError("`player` must be 0 or 1", player)

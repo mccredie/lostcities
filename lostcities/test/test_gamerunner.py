@@ -46,6 +46,24 @@ class PlayerStub(gamerunner.Player):
 
 
 
+class RaisingPlayerStub(gamerunner.Player):
+    def __init__(self):
+        self.play_card_raise = None
+        self.draw_raise = None
+
+
+    def play_card(self, play_proxy):
+        if self.play_card_raise is not None:
+            raise self.play_card_raise
+
+
+    def draw(self, draw_proxy):
+        if self.draw_raise is not None:
+            raise self.play_card_raise
+
+
+
+
 class GameStateStub:
     def __init__(self):
         self.game_over = False
@@ -379,6 +397,9 @@ class GameRunnerTests(unittest.TestCase):
         self.assertIsNone(p1.they_drew_from_card)
         runner.finish_draw_from(the_card)
         self.assertTrue(the_card, p1.they_drew_from_card)
+
+
+        
 
 
 
