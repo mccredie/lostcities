@@ -437,24 +437,24 @@ def main():
 
 
 if __name__ == "__main__":
-    #main()
+    main()
 
-    from matplotlib.pyplot import hist
-    from numpy import mean, std
-    risk = -4
-    cutoff = 8
-    print("risk:", risk)
-    print("cutoff:", cutoff)
-    
-    results = list(play_games(
-            1000, TheOnePlayer, -4, 4))
-            
-    avg = mean(results)
-    dev = std(results)
-    print("mean:", avg)
-    print("std dev:", dev)
-    print("ratio:", avg / dev)
-    hist(results)
-
+#    from matplotlib.pyplot import hist
+#    from numpy import mean, std
+#    risk = -4
+#    cutoff = 8
+#    print("risk:", risk)
+#    print("cutoff:", cutoff)
+#    
+#    results = list(play_games(
+#            1000, TheOnePlayer, -4, 4))
+#            
+#    avg = mean(results)
+#    dev = std(results)
+#    print("mean:", avg)
+#    print("std dev:", dev)
+#    print("ratio:", avg / dev)
+#    hist(results)
+#
     
 
