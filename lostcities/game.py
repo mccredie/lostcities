@@ -13,7 +13,7 @@ class Game:
     @property
     def deck(self):
         return self.state.deck
-    
+
 
     @property
     def discards(self):
@@ -28,7 +28,7 @@ class Game:
         return not bool(self.deck)
 
     def _check_player_value(self, player):
-        if not 0 <= player <= 1: 
+        if not 0 <= player <= 1:
             raise ValueError("`player` must be 0 or 1", player)
 
 
@@ -42,12 +42,12 @@ class Game:
         the_card = self.discards[adventure].pop()
         self.players[player].hand.append(the_card)
         return the_card
-        
+
 
     def _card_value(self, card):
         value = card[1]
         if value == 'i':
-            value = 11
+            value = -1
         return value
 
 
@@ -57,9 +57,9 @@ class Game:
         adventure = card[0]
         adventure_pile = self.players[player].adventures[adventure]
 
-        if (adventure_pile and 
-                self._card_value(card) > self._card_value(adventure_pile[-1])):
-            raise ValueError("Cannot play onto lower valued card.")
+        if (adventure_pile and
+                self._card_value(card) < self._card_value(adventure_pile[-1])):
+            raise ValueError("Must play onto lower valued card.")
 
         del self.players[player].hand[cardindex]
         self.players[player].adventures[adventure].append(card)

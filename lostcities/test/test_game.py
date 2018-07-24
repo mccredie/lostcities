@@ -14,17 +14,17 @@ class GameTests(unittest.TestCase):
         the_deck = list(deck.deck_gen())
         g.deck[:] = the_deck[:]
 
-        g.draw(p) 
+        g.draw(p)
 
         self.assertEqual([the_deck[-1]], g.players[p].hand)
         self.assertEqual(the_deck[:-1], g.deck)
 
-    
+
     def test_get_draw_from_moves_card_from_related_discard(self):
         p = 0
         adventure = 'r'
         g = game.Game()
-        discards = [('r', 1), ('r', 2), ('r', 3) , ('r', 4)] 
+        discards = [('r', 1), ('r', 2), ('r', 3) , ('r', 4)]
         g.discards['r'][:] = discards[:]
 
         g.draw_from(p, 'r')
@@ -37,7 +37,7 @@ class GameTests(unittest.TestCase):
         adventure = 'r'
         g = game.Game()
         top_card = ('r', 4)
-        discards = [('r', 1), ('r', 2), ('r', 3) , top_card] 
+        discards = [('r', 1), ('r', 2), ('r', 3) , top_card]
         g.discards['r'][:] = discards[:]
 
         self.assertEqual(top_card, g.draw_from(p, 'r'))
@@ -49,20 +49,20 @@ class GameTests(unittest.TestCase):
     def test_play_puts_card_in_adventure(self):
         p = 0
         g = game.Game()
-        hand = [('r', 1), ('g', 2), ('b', 3) , ('b', 4)] 
+        hand = [('r', 1), ('g', 2), ('b', 3) , ('b', 4)]
         g.players[p].hand[:] = hand[:]
 
         g.play(p, 0)
 
         self.assertEqual([('r', 1)], g.players[p].adventures['r'])
         self.assertEqual(hand[1:], g.players[p].hand)
-    
+
 
     def test_play_returns_played_card(self):
         p = 0
         g = game.Game()
         the_card = ('r', 1)
-        hand = [the_card, ('g', 2), ('b', 3) , ('b', 4)] 
+        hand = [the_card, ('g', 2), ('b', 3) , ('b', 4)]
         g.players[p].hand[:] = hand[:]
 
         self.assertEqual(the_card, g.play(p, 0))
@@ -71,7 +71,7 @@ class GameTests(unittest.TestCase):
     def test_discard_puts_card_in_correct_pile(self):
         p = 0
         g = game.Game()
-        hand = [('r', 1), ('g', 2), ('b', 3) , ('b', 4)] 
+        hand = [('r', 1), ('g', 2), ('b', 3) , ('b', 4)]
         g.players[p].hand[:] = hand[:]
 
         g.discard(p, 1)
@@ -84,7 +84,7 @@ class GameTests(unittest.TestCase):
         p = 0
         g = game.Game()
         the_card = ('g', 2)
-        hand = [('r', 1), the_card, ('b', 3) , ('b', 4)] 
+        hand = [('r', 1), the_card, ('b', 3) , ('b', 4)]
         g.players[p].hand[:] = hand[:]
 
         self.assertEqual(the_card, g.discard(p, 1))
@@ -96,17 +96,17 @@ class GameTests(unittest.TestCase):
         the_deck = list(deck.deck_gen())
         g.deck[:] = the_deck[:]
 
-        g.draw(p) 
+        g.draw(p)
 
         self.assertEqual([the_deck[-1]], g.players[p].hand)
         self.assertEqual(the_deck[:-1], g.deck)
 
-    
+
     def test_p2_get_draw_from_moves_card_from_related_discard(self):
         p = 1
         adventure = 'r'
         g = game.Game()
-        discards = [('r', 1), ('r', 2), ('r', 3), ('r', 4)]  
+        discards = [('r', 1), ('r', 2), ('r', 3), ('r', 4)]
 
         g.discards['r'] = discards[:]
 
@@ -119,19 +119,19 @@ class GameTests(unittest.TestCase):
     def test_p2_play_puts_card_in_adventure(self):
         p = 1
         g = game.Game()
-        hand = [('r', 1), ('g', 2), ('b', 3) , ('b', 4)] 
+        hand = [('r', 1), ('g', 2), ('b', 3) , ('b', 4)]
         g.players[p].hand[:] = hand
 
         g.play(p, 0)
 
         self.assertEqual([('r', 1)], g.players[p].adventures['r'])
         self.assertEqual(hand[1:], g.players[p].hand)
-    
+
 
     def test_p2_discard_puts_card_in_correct_pile(self):
         p = 1
         g = game.Game()
-        hand = [('r', 1), ('g', 2), ('b', 3) , ('b', 4)] 
+        hand = [('r', 1), ('g', 2), ('b', 3) , ('b', 4)]
         g.players[p].hand[:] = hand
 
         g.discard(p, 1)
@@ -165,49 +165,49 @@ class GameTests(unittest.TestCase):
     def test_draw_raises_ValueError_on_bad_player_value(self):
         p = 40
         g = game.Game()
-        self.assertRaises(ValueError, g.draw, p) 
+        self.assertRaises(ValueError, g.draw, p)
 
 
     def test_draw_raises_TypeError_on_non_number_player_value(self):
         p = 'matt'
         g = game.Game()
-        self.assertRaises(TypeError, g.draw, p) 
+        self.assertRaises(TypeError, g.draw, p)
 
 
     def test_draw_from_raises_ValueError_on_bad_player_value(self):
         p = 40
         g = game.Game()
-        self.assertRaises(ValueError, g.draw_from, p, 'r') 
+        self.assertRaises(ValueError, g.draw_from, p, 'r')
 
 
     def test_draw_from_raises_TypeError_on_non_number_player_value(self):
         p = 'matt'
         g = game.Game()
-        self.assertRaises(TypeError, g.draw_from, p, 'r') 
+        self.assertRaises(TypeError, g.draw_from, p, 'r')
 
 
     def test_play_raises_ValueError_on_bad_player_value(self):
         p = 40
         g = game.Game()
-        self.assertRaises(ValueError, g.play, p, 0) 
+        self.assertRaises(ValueError, g.play, p, 0)
 
 
     def test_play_raises_TypeError_on_non_number_player_value(self):
         p = 'matt'
         g = game.Game()
-        self.assertRaises(TypeError, g.play, p, 0) 
+        self.assertRaises(TypeError, g.play, p, 0)
 
 
     def test_discard_raises_ValueError_on_bad_player_value(self):
         p = 40
         g = game.Game()
-        self.assertRaises(ValueError, g.discard, p, 0) 
+        self.assertRaises(ValueError, g.discard, p, 0)
 
 
     def test_discard_raises_TypeError_on_non_number_player_value(self):
         p = 'matt'
         g = game.Game()
-        self.assertRaises(TypeError, g.discard, p, 0) 
+        self.assertRaises(TypeError, g.discard, p, 0)
 
 
     def test_play_invest_on_number_raises_ValueError(self):
@@ -229,11 +229,11 @@ class GameTests(unittest.TestCase):
         self.assertEqual(('r', 'i'), g.players[p].adventures['r'][0])
 
 
-    def test_play_value_on_lower_value_raises_ValueError(self):
+    def test_play_value_on_higher_value_raises_ValueError(self):
         p = 0
         g = game.Game()
-        g.players[p].hand[:] = [('g', 5)]
-        g.players[p].adventures['g'][:] = [('g', 4)]
+        g.players[p].hand[:] = [('g', 4)]
+        g.players[p].adventures['g'][:] = [('g', 5)]
 
         self.assertRaises(ValueError, g.play, p, 0)
 
@@ -246,7 +246,7 @@ class GameTests(unittest.TestCase):
 
         g.play(p, 0)
 
-        self.assertEqual([('g', 'i'), ('g', 'i')], 
+        self.assertEqual([('g', 'i'), ('g', 'i')],
                 g.players[p].adventures['g'])
 
 

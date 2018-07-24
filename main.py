@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # encoding: utf-8
 
 
@@ -26,15 +26,15 @@ def init_game():
 class CardValueGetter:
     def __init__(self, ivalue=None):
         if ivalue is None:
-            ivalue = 11
+            ivalue = -1
         self._ivalue = ivalue
-        
+
     def __call__(self, card):
         value = card[1]
         if value == lostcities.INVESTMENT:
             value = self._ivalue
         return value
-        
+
 
 
 class GameScorer:
@@ -48,22 +48,22 @@ class GameScorer:
             for value in stack:
                 scorer.put(value)
         return scorer
-    
+
     @staticmethod
     def from_gameproxy(game):
         return GameScorer.from_dict(game.adventures)
 
-    
+
     @staticmethod
     def from_gamestate(game):
         return tuple(GameScorer.from_dict(game.players[p].adventures)
                 for p in range(2))
 
-        
+
     def put(self, card):
         suit, value = card
         self._adventures[suit].put(value)
-        
+
     def score(self, suits=None):
         if suits is None:
             suits = self.active_suits
@@ -71,16 +71,16 @@ class GameScorer:
         for suit in suits:
             total += self._adventures[suit].score()
         return total
-    
+
     def iter_scores(self):
         for k, v in self._adventures.items():
             yield k, v.score()
-        
+
     @property
     def active_suits(self):
-        return set(self._adventures)       
+        return set(self._adventures)
 
-        
+
 
 class TheOnePlayer(lostcities.Player):
     """ This player does the following:
@@ -95,7 +95,7 @@ class TheOnePlayer(lostcities.Player):
 
     Note that this is still a heuristic AI.  It does not take into account
     what the other player is doing, or whether it may be benefiting the other
-    player. 
+    player.
 
     This is the first AI that I have implemented that is capable of fairly
     consistently beating the DiscardPlayer.  Although it isn't immensely
@@ -108,30 +108,29 @@ class TheOnePlayer(lostcities.Player):
         self._risk = risk
         self._cutoff = cutoff
 
-        
+
     def _is_playable(self, card):
         stack = self._game.adventures[card[0]]
         if not stack:
             return True
-        
+
         top_value = self._get_card_value(stack[-1])
         card_value = self._get_card_value(card)
-        
-        return top_value >= card_value  
-        
-        
-    def _get_largest_playable(self, suits=None):
+
+        return top_value <= card_value
+
+
+    def _get_smallest_playable(self, suits=None):
         if suits is None:
             suits = lostcities.SUITS
-        
-        for card in sorted(self._game.hand, reverse=True, 
-                           key=self._get_card_value):
+
+        for card in sorted(self._game.hand, key=self._get_card_value):
             if card[0] not in suits:
                 continue
             if self._is_playable(card):
                 return card
-                
-    
+
+
     def play_card(self, game):
         self._game = game
         scorer = GameScorer.from_gameproxy(game)
@@ -139,34 +138,34 @@ class TheOnePlayer(lostcities.Player):
         for suit in active_suits:
             score = scorer.score(suit)
             if score < 0:
-                card = self._get_largest_playable(suit)
+                card = self._get_smallest_playable(suit)
                 if card is not None:
                     i = game.hand.index(card)
                     game.play(i)
                     return
 
         if game.deck_remaining > self._cutoff:
-            suits_in_hand = set([card[0] for card in game.hand])        
-            for card in sorted(game.hand, reverse=True, 
+            suits_in_hand = set([card[0] for card in game.hand])
+            for card in sorted(game.hand, reverse=True,
                                key=self._get_card_value):
                 if self._is_playable(card):
                     scorer.put(card)
                 else:
                     self._to_discard = []
-    
+
             best_card = None
-            best_score = self._risk       
+            best_score = self._risk
             for suit in suits_in_hand:
                 score = scorer.score(suit)
                 if score > best_score:
-                    best_card = self._get_largest_playable(suit)
+                    best_card = self._get_smallest_playable(suit)
                     best_score = score
-            
+
             if best_card is not None:
-                i = game.hand.index(best_card)            
+                i = game.hand.index(best_card)
                 game.play(i)
                 return
-        
+
         if self._to_discard:
             for card in self._to_discard[:]:
                 if card in game.hand:
@@ -174,7 +173,7 @@ class TheOnePlayer(lostcities.Player):
                     game.discard(i)
                     self._to_discard.remove(card)
                     return
-        
+
 
         inactive_suits = lostcities.SUITS - active_suits
         cards = sorted(game.hand, key=self._get_card_value)
@@ -182,10 +181,10 @@ class TheOnePlayer(lostcities.Player):
             if card[0] in inactive_suits:
                 game.discard(game.hand.index(card))
                 return
-        
+
         game.discard(game.hand.index(cards[0]))
-            
-    
+
+
     def draw(self, game):
         suits = set(s for s, c in game.adventures.items() if c)
 
@@ -196,35 +195,35 @@ class TheOnePlayer(lostcities.Player):
         game.draw()
 
 
-        
+
 class GatedPlayer(lostcities.Player):
-    def __init__(self, max_suits=2, ivalue=-11):
+    def __init__(self, max_suits=2, ivalue=-1):
         self._get_value = CardValueGetter(ivalue)
         self._to_discard = []
         self._game = None
         self._suits_played = set()
         self._max_suits = max_suits
-    
+
     def _find_last_played_card(self, suit):
         if self._game.adventures[suit]:
             return self._game.adventures[suit][-1]
-    
-    
+
+
     def _card_in_range(self, top, card):
         suit = card[0]
         if suit not in self._suits_played:
             if len(self._suits_played) >= self._max_suits:
                 return False
-            
+
         card_value = self._get_value(card)
         if top is None:
-            return card_value >= 9          
+            return card_value >= 9
         top_value = self._get_value(top)
         if card_value > top_value:
             self._to_discard.append(card)
         return top_value >= card_value > top_value - 4
 
-    
+
     def _select_card(self, cards):
         for card in cards:
             last = self._find_last_played_card(card[0])
@@ -232,13 +231,13 @@ class GatedPlayer(lostcities.Player):
                 self._suits_played.add(card[0])
                 return card
 
-        
+
     def play_card(self, game):
-        self._game = game        
+        self._game = game
         cards = sorted(self._game.hand, key=self._get_value, reverse=True)
         card_to_play = self._select_card(cards)
 
-        
+
         if card_to_play is not None:
             i = game.hand.index(card_to_play)
             game.play(i)
@@ -251,7 +250,7 @@ class GatedPlayer(lostcities.Player):
                     self._to_discard.remove(c)
         else:
             game.discard(game.hand.index(cards[-1]))
-        
+
 
     def draw(self, game):
         for card in game.discards:
@@ -268,11 +267,11 @@ class RestrictedPlayer(lostcities.Player):
         self._minvalue = minvalue
         self._get_value = CardValueGetter(ivalue)
         self._to_discard = []
-        
+
     def play_card(self, game):
         cards = sorted(game.hand, key=self._get_value, reverse=True)
         for card in cards:
-            if (card[0] in self._colors and 
+            if (card[0] in self._colors and
                     self._get_value(card) >= self._minvalue):
                 try:
                     i = game.hand.index(card)
@@ -294,7 +293,7 @@ class RestrictedPlayer(lostcities.Player):
                     self._to_discard.remove(c)
         else:
             game.discard(game.hand.index(cards[-1]))
-        
+
 
 
     def draw(self, game):
@@ -315,16 +314,16 @@ def get_remainder(card):
     """
     v = card[1]
     if v == lostcities.INVESTMENT:
-        v = 11
+        v = -1
     return range(v-1, 1, -1)
-    
-    
+
+
 
 class TrickyPlayer(lostcities.Player):
     def __init__(self):
         self.colors_played = set()
         self._to_discard = []
-    
+
     def find_highest_possible_score(self):
         highest_score = -1000
         highest_index = None
@@ -346,7 +345,7 @@ class TrickyPlayer(lostcities.Player):
                 self._to_discard.append(card)
             if highest_score > 0:
                 return highest_index
-    
+
 
     def play_card(self, game):
         self._game = game
@@ -409,7 +408,7 @@ def score(adventures):
 def play_games(count, player=TrickyPlayer, *args, **kwargs):
     for _ in range(count):
         game = init_game()
-        runner = lostcities.GameRunner(game, 
+        runner = lostcities.GameRunner(game,
                 player(*args, **kwargs), TheOnePlayer())
 
         while not runner.game_is_over:
@@ -426,11 +425,11 @@ def main():
     while not runner.game_is_over:
         runner.update()
 
-    print("p1") 
+    print("p1")
     pprint.pprint(dict(game.players[0].adventures))
     print("total:", score(game.players[0].adventures))
 
-    print("p2") 
+    print("p2")
     pprint.pprint(dict(game.players[1].adventures))
     print("total:", score(game.players[1].adventures))
 
@@ -445,10 +444,10 @@ if __name__ == "__main__":
 #    cutoff = 8
 #    print("risk:", risk)
 #    print("cutoff:", cutoff)
-#    
+#
 #    results = list(play_games(
 #            1000, TheOnePlayer, -4, 4))
-#            
+#
 #    avg = mean(results)
 #    dev = std(results)
 #    print("mean:", avg)
@@ -456,5 +455,5 @@ if __name__ == "__main__":
 #    print("ratio:", avg / dev)
 #    hist(results)
 #
-    
+
 
