@@ -217,11 +217,11 @@ class GatedPlayer(lostcities.Player):
 
         card_value = self._get_value(card)
         if top is None:
-            return card_value >= 9
+            return card_value <= 4
         top_value = self._get_value(top)
-        if card_value > top_value:
+        if card_value < top_value:
             self._to_discard.append(card)
-        return top_value >= card_value > top_value - 4
+        return top_value <= card_value < top_value - 4
 
 
     def _select_card(self, cards):
@@ -234,7 +234,7 @@ class GatedPlayer(lostcities.Player):
 
     def play_card(self, game):
         self._game = game
-        cards = sorted(self._game.hand, key=self._get_value, reverse=True)
+        cards = sorted(self._game.hand, key=self._get_value)
         card_to_play = self._select_card(cards)
 
 
@@ -269,7 +269,7 @@ class RestrictedPlayer(lostcities.Player):
         self._to_discard = []
 
     def play_card(self, game):
-        cards = sorted(game.hand, key=self._get_value, reverse=True)
+        cards = sorted(game.hand, key=self._get_value)
         for card in cards:
             if (card[0] in self._colors and
                     self._get_value(card) >= self._minvalue):
@@ -305,7 +305,7 @@ def can_play_on(top, card):
         return True
     if card == lostcities.INVESTMENT:
         return False
-    return top > card
+    return top < card
 
 
 def get_remainder(card):
@@ -419,8 +419,10 @@ def play_games(count, player=TrickyPlayer, *args, **kwargs):
 
 def main():
     game = init_game()
-    runner = lostcities.GameRunner(game, TheOnePlayer(),
-            TheOnePlayer())
+    runner = lostcities.GameRunner(
+        game,
+        TheOnePlayer(),
+        GatedPlayer())
 
     while not runner.game_is_over:
         runner.update()
@@ -437,23 +439,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-#    from matplotlib.pyplot import hist
-#    from numpy import mean, std
-#    risk = -4
-#    cutoff = 8
-#    print("risk:", risk)
-#    print("cutoff:", cutoff)
-#
-#    results = list(play_games(
-#            1000, TheOnePlayer, -4, 4))
-#
-#    avg = mean(results)
-#    dev = std(results)
-#    print("mean:", avg)
-#    print("std dev:", dev)
-#    print("ratio:", avg / dev)
-#    hist(results)
-#
-
 
